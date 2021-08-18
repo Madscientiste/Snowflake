@@ -1,12 +1,6 @@
-import multiprocessing
 from datetime import datetime
 import time
-from pprint import pprint
 
-import numpy as np
-
-from timeit import default_timer as timer
-from datetime import timedelta
 
 # TODO : safe mod, where it make sure the id generated is safe ( slower )
 class Snowflake:
@@ -83,7 +77,7 @@ class Snowflake:
 
     @property
     def timestamp(self):
-        return float((self.snowflake >> 22) + self.initial_epoch) / 1000
+        return float((int(self) >> 22) + self.initial_epoch) / 1000
 
     @property
     def to_date(self, format="%d-%m-%Y | %H:%M:%S"):
@@ -91,37 +85,8 @@ class Snowflake:
 
     @property
     def to_binary(self):
-        return format(self.snowflake, "08b")
+        return format(int(self), "08b")
 
-
-timeout = 1
-timeout_start = time.time()
-ids = []
-
-
-def generate_snowflakes(*args):
-    process_name = multiprocessing.current_process().name
-    process_id = int(process_name.split("-")[-1])
-
-    ids = []
-    snowflake = Snowflake(process_id=process_id)
-
-    for i in range(1000):
-        id = next(snowflake)
-        ids.append(int(id))
-
-    return ids
-
-
-if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=4)
-    result = pool.map(generate_snowflakes, range(10000))
-    result_flat = [id for ids in result for id in ids]
-
-    pool.close()
-    pool.join()
-
-    unique_ids = []
-    unique_ids.sort()
-
-    pprint((np.unique(result_flat).size))
+    @property
+    def to_hex(self):
+        return "%16x" % int(self)
