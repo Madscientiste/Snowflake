@@ -1,14 +1,17 @@
+import multiprocessing
 from datetime import datetime
 import time
+from pprint import pprint
+
+import numpy as np
 
 from timeit import default_timer as timer
 from datetime import timedelta
 
-
+# TODO : safe mod, where it make sure the id generated is safe ( slower )
 class Snowflake:
 
     # Saturday, 1 January 2011 12:00:00 GMT+01:00
-    # Creation of actimeo
     initial_epoch = 1293879600000
     mask = lambda x: -1 ^ (-1 << x)
     sleep = lambda x: time.sleep(x / 1000)
@@ -34,11 +37,17 @@ class Snowflake:
 
     def __new__(cls, *args, **kwds):
         cls.instance_id = (cls.instance_id + 1) & cls.instance_mask
-        return super(Snowflake, cls).__new__(cls, *args, **kwds)
+        return super(Snowflake, cls).__new__(cls)
 
     def __init__(self, snowflake=0, process_id=0):
-        self.snowflake = snowflake
         self.sequence = 0
+        self.last_timestamp = 0
+
+        self.process_id = process_id
+        self.snowflake = snowflake
+
+        if snowflake == 0:
+            next(self)
 
     def __int__(self):
         return self.snowflake
@@ -50,28 +59,20 @@ class Snowflake:
         return f"{self.__class__.__name__}({str(self)})"
 
     def __next__(self):
-        self.sequence = (self.sequence + 1) & self.sequence_mask
+        self.snowflake = next(iter(self))
         return self
 
     def __iter__(self):
-        last_timestamp = -1
-
         while True:
             timestamp = self.get_timestamp()
 
-            if last_timestamp > timestamp:
-                print("clock is moving backwards. waiting until {last_timestamp}")
-                self.sleep(last_timestamp - timestamp)
-                continue
-
-            if last_timestamp == timestamp:
-                next(self)
+            if self.last_timestamp == timestamp:
+                timestamp = self.get_timestamp()
+                self.sequence = (self.sequence + 1) & self.sequence_mask
             else:
                 self.sequence = 0
 
-            print(self.sequence)
-
-            last_timestamp = timestamp
+            self.last_timestamp = timestamp
 
             b_timestamp = (timestamp - self.initial_epoch) << self.timestamp_shift
             b_process = (self.process_id & self.process_mask) << self.process_shift
@@ -93,20 +94,34 @@ class Snowflake:
         return format(self.snowflake, "08b")
 
 
-# tobin = lambda x: format(x, "08b")
-
 timeout = 1
 timeout_start = time.time()
 ids = []
 
-start = timer()
-for snowflake in Snowflake():
-    ids.append(snowflake)
-    # print(snowflake)
-    if time.time() > timeout_start + timeout:
-        break
 
-end = timer()
+def generate_snowflakes(*args):
+    process_name = multiprocessing.current_process().name
+    process_id = int(process_name.split("-")[-1])
 
-print(len(ids))
-print(timedelta(seconds=end - start))
+    ids = []
+    snowflake = Snowflake(process_id=process_id)
+
+    for i in range(1000):
+        id = next(snowflake)
+        ids.append(int(id))
+
+    return ids
+
+
+if __name__ == "__main__":
+    pool = multiprocessing.Pool(processes=4)
+    result = pool.map(generate_snowflakes, range(10000))
+    result_flat = [id for ids in result for id in ids]
+
+    pool.close()
+    pool.join()
+
+    unique_ids = []
+    unique_ids.sort()
+
+    pprint((np.unique(result_flat).size))
