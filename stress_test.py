@@ -36,7 +36,7 @@ def mp_generate_snowflakes(*args):
 if __name__ == "__main__":
     start = timer()
 
-    pool = multiprocessing.Pool(processes=4)
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
     result = pool.map(mp_generate_snowflakes, range(1000))
     end = timer()
 
@@ -48,12 +48,14 @@ if __name__ == "__main__":
     unique_ids = []
     unique_ids.sort()
 
-    pprint((np.unique(result_flat).size))
+    pprint(f"{(np.unique(result_flat).size):,}")
     print(timedelta(seconds=end - start))
+    print("With multi-processing \n")
 
     start = timer()
     generated = [id for id in generate_snowflakes(100000)]
     end = timer()
 
-    pprint((np.unique(generated).size))
+    pprint(f"{(np.unique(generated).size):,}")
     print(timedelta(seconds=end - start))
+    print("For a regular instance")

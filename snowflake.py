@@ -2,8 +2,26 @@ from datetime import datetime
 import time
 
 
-# TODO : safe mod, where it make sure the id generated is safe ( slower )
 class Snowflake:
+    """
+    Snowflake.
+
+    ...
+
+    Attributes
+    ----------
+    name : str
+        first name of the person
+    surname : str
+        family name of the person
+    age : int
+        age of the person
+
+    Methods
+    -------
+    timestamp(additional=""):
+        Prints the person's name and age.
+    """
 
     # Saturday, 1 January 2011 12:00:00 GMT+01:00
     initial_epoch = 1293879600000
@@ -14,15 +32,16 @@ class Snowflake:
     sequence_bits = 10
     sequence_mask = mask(sequence_bits)
 
+    # Instance are used to avoid conflict if you call this class multiple times in your application
     instance_bits = 6
     instance_mask = mask(instance_bits)
     instance_shift = sequence_bits
     instance_id = 0
 
-    process_bits = 6
-    process_mask = mask(instance_bits)
-    process_shift = sequence_bits + instance_bits
-    process_id = 0
+    process_bits = 6  # how much a process takes space
+    process_mask = mask(instance_bits)  # the max value that a process_id can reach
+    process_shift = sequence_bits + instance_bits  # how much to shift the bits
+    process_id = 0  # should be incremented if you are using multiprocessing
 
     timestamp_bits = 42
     timestamp_mask = mask(timestamp_bits)
@@ -77,16 +96,28 @@ class Snowflake:
 
     @property
     def timestamp(self):
+        """
+        Get the timestamp of the current snowflake.
+        """
         return float((int(self) >> 22) + self.initial_epoch) / 1000
 
     @property
     def to_date(self, format="%d-%m-%Y | %H:%M:%S"):
+        """
+        Get the date of the current snowflake.
+        """
         return datetime.fromtimestamp(self.timestamp).strftime(format)
 
     @property
     def to_binary(self):
+        """
+        Converts the current snowflake to binary.
+        """
         return format(int(self), "08b")
 
     @property
     def to_hex(self):
+        """
+        Converts the current snowflake to hexdecimal of 16 chars wide.
+        """
         return "%16x" % int(self)
