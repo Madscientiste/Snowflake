@@ -6,21 +6,12 @@ class Snowflake:
     """
     Snowflake.
 
-    ...
-
     Attributes
     ----------
-    name : str
-        first name of the person
-    surname : str
-        family name of the person
-    age : int
-        age of the person
-
-    Methods
-    -------
-    timestamp(additional=""):
-        Prints the person's name and age.
+    snowflake : int
+        an existing snowflake to parse
+    process_id : int
+        the process_id ( for multi processing ), max value is 63
     """
 
     # Saturday, 1 January 2011 12:00:00 GMT+01:00
@@ -39,7 +30,7 @@ class Snowflake:
     instance_id = 0
 
     process_bits = 6  # how much a process takes space
-    process_mask = mask(instance_bits)  # the max value that a process_id can reach
+    process_mask = mask(process_bits)  # the max value that a process_id can reach
     process_shift = sequence_bits + instance_bits  # how much to shift the bits
     process_id = 0  # should be incremented if you are using multiprocessing
 
@@ -52,7 +43,8 @@ class Snowflake:
         cls.instance_id = (cls.instance_id + 1) & cls.instance_mask
         return super(Snowflake, cls).__new__(cls)
 
-    def __init__(self, snowflake=0, process_id=0):
+    def __init__(self, snowflake: int = 0, process_id: int = 0):
+        self.instance_id = self.instance_id
         self.sequence = 0
         self.last_timestamp = 0
 
