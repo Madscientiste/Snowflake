@@ -7,7 +7,7 @@ import copy
 
 import numpy as np
 
-from snowflake import Snowflake
+from generator import Snowflake
 
 
 # Will probably add it by default to the Snowflake Class
@@ -34,7 +34,6 @@ def mp_generate_snowflakes(*args):
         ids.append(int(id))
 
     return ids
-
 
 
 # # not the best test ever, but works to get an idea if it works well or doesn't
