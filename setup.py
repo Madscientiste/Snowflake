@@ -6,7 +6,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="snowflake",
-    version="2.5.0",
+    version="2.5.3",
     description="Generate snowflakes",
     long_description=README,
     url="https://github.com/Madscientiste/Snowflake",
