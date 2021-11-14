@@ -92,8 +92,8 @@ this will surely be a problem if you are generating a lot of ids per day
 also, im not a pro python (even tho im currently working)
 doesn't mean its perfect, things are maybe done the wrong way..
 
-don't hesitate to do a pull request if you fond something wrong !
+don't hesitate to do a pull request if you found something wrong !
 
 ## Installation
 
-i did not publish to pip, your only way to installing is by copying and paste in your project .. its only one file though
+To come.
