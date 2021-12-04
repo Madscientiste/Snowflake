@@ -2,90 +2,16 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Union
 
-import multiprocessing
 import copy
-import time
 
-EPOCH = datetime(2011, 1, 1)
-INITIAL_EPOCHE = int(time.mktime(EPOCH.timetuple()))
+from .bits import Bits
+from .__functions import get_worker_id, get_timestamp, to_next_ms
 
-mask = lambda x: -1 ^ (-1 << x)
-sleep = lambda x: time.sleep(x / 1000)
-get_timestamp = lambda: int(time.time() * 1000)
+from .__config import INITIAL_EPOCHE
 
-
-def get_worker_id():
-    name = multiprocessing.current_process().name
-    return int(name.split("-")[-1]) if "PoolWorker" in name else 0
-
-
-def validate(func):
-    def wrapper(*args, **kwargs):
-        other = kwargs.get("other", None)
-        if other is not None and type(other) != int:
-            raise TypeError(f"{other} must be an int")
-
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
-class Bits:
-    def __init__(self, bits: int, shift: int, name: str):
-        self.bits = bits
-        self.mask = mask(bits)
-        self.name = name
-        self.shift = shift
-        self.value = 0
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({str(self)})"
-
-    def __str__(self):
-        return f"{self.value}"
-
-    def __int__(self):
-        return self.value
-
-    def __get__(self, instance, cls):
-        return self.value if instance is None else self
-
-    def __set__(self, instance, other):
-        if isinstance(other, int):
-            self.value = other & self.mask
-        elif isinstance(other, Bits):
-            self.value = other.value & self.mask
-        else:
-            raise TypeError(f"{other} is not an int")
-        return self
-
-    def __radd__(self, other):
-        return self.value + other
-
-    def __add__(self, other):
-        self.value = (self.value + other) & self.mask
-        return self
-
-    @validate
-    def __xor__(self, other):
-        return self.value ^ other
-
-    @validate
-    def __and__(self, other):
-        return self.value & other
-
-    @validate
-    def __or__(self, other):
-        return self.value | other
-
-    @validate
-    def __lshift__(self, other):
-        return self.value << other
-
-    @validate
-    def __rshift__(self, other):
-        return self.value << other
-
+print("-" * 50)
+print("initial epoch:", INITIAL_EPOCHE)
+print("")
 
 # [Timestamp][42](64 to 22)
 # Miliseconds since the epoch specified
@@ -104,15 +30,6 @@ class Bits:
 # 00000 00000 000
 
 
-def to_next_ms(prev_timestamp: int) -> int:
-    timestamp = get_timestamp()
-
-    while timestamp <= prev_timestamp:
-        timestamp = get_timestamp()
-
-    return timestamp
-
-
 class Snowflake:
     timestamp = Bits(42, 22, "timestamp")
     worker_id = Bits(5, 17, "worker_id")
@@ -126,10 +43,9 @@ class Snowflake:
         return instance
 
     def __init__(self, snowflake: Union[str, int] = None):
-        self.snowflake = snowflake
-        # set the sequence to 0 so there is not mutation beween instances
-        self.sequence = 0
+        self.sequence = 0  # set the sequence to 0 so there is not mutation beween instances
         self.last_timestamp = 0
+        self.snowflake = snowflake or int(next(self))
 
     def __str__(self):
         return f"{self.snowflake}"
@@ -169,3 +85,33 @@ class Snowflake:
             bits_03 = self.sequence << self.sequence.shift
 
             yield bits_00 | bits_01 | bits_02 | bits_03
+
+    def generate(self, amount: int = 1) -> list:
+        """Generate a list of snowflakes"""
+        return [int(next(self)) for _ in range(amount)]
+
+    def generate_v2(self, amount: int = 1) -> list:
+        """Same as generate but using a while loop"""
+        store = []
+        while amount != len(store):
+            store.append(int(next(self)))
+        return store
+
+    @staticmethod
+    def get_epoch():
+        return INITIAL_EPOCHE
+
+    @property
+    def get_timestamp(self):
+        return ((int(self) >> self.timestamp.shift) + INITIAL_EPOCHE) / 1000
+
+    @property
+    def to_binary(self):
+        return format(int(self), "08b")
+
+    @property
+    def get_worker_id(self):
+        return self.worker_id
+
+    def to_date(self, fmt="%d-%m-%Y | %H:%M:%S"):
+        return datetime.fromtimestamp(self.get_timestamp).strftime(fmt)
