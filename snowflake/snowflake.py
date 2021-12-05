@@ -9,9 +9,6 @@ from .__functions import get_worker_id, get_timestamp, to_next_ms
 
 from .__config import INITIAL_EPOCHE
 
-print("-" * 50)
-print("initial epoch:", INITIAL_EPOCHE)
-print("")
 
 # [Timestamp][42](64 to 22)
 # Miliseconds since the epoch specified
@@ -31,6 +28,7 @@ print("")
 
 
 class Snowflake:
+
     timestamp = Bits(42, 22, "timestamp")
     worker_id = Bits(5, 17, "worker_id")
     instance_id = Bits(5, 12, "instance_id")

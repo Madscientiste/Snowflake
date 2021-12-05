@@ -1,23 +1,30 @@
-import time
+# import time
 
-from datetime import datetime
-from snowflake import setup_snowflake, Snowflake
+from snowflake.bits import Bits
+from snowflake.snowflake import Snowflake
 
-setup_snowflake(epoch=datetime(2020, 1, 1))
+# from datetime import datetime
+# from snowflake import setup_snowflake, Snowflake
 
-id_generator = Snowflake()
+# setup_snowflake(epoch=datetime(2020, 1, 1))
 
-print(id_generator)
-print(id_generator.get_timestamp)
-print(id_generator.to_date())
-print(id_generator.get_epoch())
+# id_generator = Snowflake()
+# id_generator = Snowflake()
+# id_generator = Snowflake()
+# id_generator = Snowflake()
+# id_generator = Snowflake()
+
+# print(id_generator)
+# print(id_generator.get_timestamp)
+# print(id_generator.to_date())
+# print(id_generator.get_epoch())
 
 # id_generator2 = Snowflake()
 
 
-# def generate_snowflakes(x):
-#     snowflake = Snowflake()
-#     return snowflake.generate(10000)
+def generate_snowflakes(x):
+    snowflake = Snowflake()
+    return snowflake.generate(10000)
 
 
 # if __name__ == "__main__":
