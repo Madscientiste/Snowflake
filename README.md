@@ -1,11 +1,8 @@
-
 # Snowflake
 
 Python implementation of Twitter's [Snowflake](https://github.com/twitter-archive/snowflake/tree/scala_28).
 
-#### NOTE  : This is not a 1:1 implementation, it has been altered to fit my needs.
-
-
+#### NOTE : This is not a 1:1 implementation, it has been altered to fit my needs.
 
 ## Explainations
 
@@ -14,7 +11,7 @@ which decrease the chance of collisions if you just call it a bunch in your prog
 
 the maximum you can reach is 63 instances at once.
 
-----
+---
 
 you can also use the `process_id` argument when (or if) you are using multiprocessing
 this one is manual you need to specifie it `Snowflake(process_id=1)` for each process
@@ -23,25 +20,27 @@ the maximum value is also 63.
 
 ---
 
-Currently you _should_ be able to generate: 
-- **1023 ids** per instance per process on the same **millisecond**. 
+Currently you _should_ be able to generate:
 
-so ... (1023 * 1000) = 1 023 000 ~ id/s
+-   **1023 ids** per instance per process on the same **millisecond**.
+
+so ... (1023 \* 1000) = 1 023 000 ~ id/s
 
 however the stress_test.py gives me:
-- 1M   ids **in less than a second** on multiprocessing ( i5-9400 6 cores )
-- 500K ids **in approx a second** on juste one instance 
+
+-   1M ids **in less than a second** on multiprocessing ( i5-9400 6 cores )
+-   500K ids **in approx a second** on juste one instance
 
 they are things that need improvements, but for my use case it does work perfectly.
 
 ### Current Structure
 
 currently using 64 bits to store:
--  timestamp   -> 42 bits -> maximum : 4398046511103
--  process_id  -> 6  bits -> maximum : 63
--  instance_id -> 6  bits -> maximum : 63
--  sequences   -> 10 bits -> maximum : 1023
 
+-   timestamp -> 42 bits -> maximum : 4398046511103
+-   process_id -> 6 bits -> maximum : 63
+-   instance_id -> 6 bits -> maximum : 63
+-   sequences -> 10 bits -> maximum : 1023
 
 ## Usage
 
@@ -96,4 +95,9 @@ don't hesitate to do a pull request if you found something wrong !
 
 ## Installation
 
-To come.
+```
+pip install git+https://github.com/Madscientiste/Snowflake.git#egg=Snowflake
+
+[or, get the main experiment branch]
+pip install git+https://github.com/Madscientiste/Snowflake.git@experimental#egg=Snowflake
+```
