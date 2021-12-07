@@ -1,39 +1,43 @@
-# import time
+from datetime import datetime
+import time
 
-from snowflake.bits import Bits
-from snowflake.snowflake import Snowflake
+from snowflake import Bits
+from snowflake import BaseSnowflake
 
-# from datetime import datetime
-# from snowflake import setup_snowflake, Snowflake
-
-# setup_snowflake(epoch=datetime(2020, 1, 1))
-
-# id_generator = Snowflake()
-# id_generator = Snowflake()
-# id_generator = Snowflake()
-# id_generator = Snowflake()
-# id_generator = Snowflake()
-
-# print(id_generator)
-# print(id_generator.get_timestamp)
-# print(id_generator.to_date())
-# print(id_generator.get_epoch())
-
-# id_generator2 = Snowflake()
+from snowflake.__functions import get_worker_id, get_timestamp, to_next_ms, validate, mask
 
 
-def generate_snowflakes(x):
-    snowflake = Snowflake()
-    return snowflake.generate(10000)
+_EPOCH = datetime(2020, 1, 1)
+epoch_ts = int(time.mktime(_EPOCH.timetuple()))
+
+last_timestamp = -1
+sequence = 0
+
+lis = []
+
+start = time.time()
+while len(lis) < 1000000:
+    timestamp = get_timestamp()
+
+    if last_timestamp == timestamp:
+        sequence = (sequence + 1) & mask(22)
+
+        # if the sequence exhausted, wait for the next millisecond
+        if sequence == 0:
+            timestamp = to_next_ms(last_timestamp)
+    else:
+        sequence = 0
+
+    if timestamp < last_timestamp:
+        raise Exception(f"Time went backwards from {last_timestamp} to {timestamp}")
+
+    last_timestamp = timestamp
+    bits_00 = (timestamp - epoch_ts) << 22
+    bits_01 = sequence
+
+    lis.append(bits_00 | bits_01)
 
 
-# if __name__ == "__main__":
-#     with multiprocessing.Pool(processes=8) as pool:
-#         start = time.perf_counter()
-#         result = pool.map(generate_snowflakes, range(100))
-#         end = time.perf_counter()
+print(f"Time taken: {time.time() - start}")
 
-#         result = np.concatenate(result).ravel().tolist()
-#         unique_ids = np.unique(result)
-
-#     print(len(result), len(unique_ids), end - start)
+print(len(lis))

@@ -28,6 +28,7 @@ class Bits:
             self.value = other.value & self.mask
         else:
             raise TypeError(f"{other} is not an int")
+
         return self
 
     def __radd__(self, other):
@@ -36,6 +37,14 @@ class Bits:
     def __add__(self, other):
         self.value = (self.value + other) & self.mask
         return self
+
+    @validate
+    def __lt__(self, other):
+        return self.value < other
+
+    @validate
+    def __gt__(self, other):
+        return self.value > other
 
     @validate
     def __xor__(self, other):
@@ -55,4 +64,4 @@ class Bits:
 
     @validate
     def __rshift__(self, other):
-        return self.value << other
+        return self.value >> other

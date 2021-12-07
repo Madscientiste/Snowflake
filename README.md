@@ -1,25 +1,18 @@
 # Snowflake
 
-```py
-snowflake0 = Snowflake()  # => 123456789, inst n°1
-snowflake1 = Snowflake()  # => 123451235, inst n°2
-snowflake2 = Snowflake()  # => 124576759, inst n°3
-snowflake3 = Snowflake()  # => 123454561, inst n°4
-```
+Python implementation of Twitter's [Snowflake](https://github.com/twitter-archive/snowflake/tree/scala_28).
 
-since its instances are limited to 5 bits (which gives us a maximum of 31 instances), its better to create one instance for a usecase.
-
-
+> **NOTE** : This is not a 1:1 implementation, it has been customized to fit my needs.
 
 ---
 
-a real life example would be:
+Currently this version does less than my previous version because i wanted it to be reusable, and customisable..
 
+Working on a light version where its not an object but a fonction and implemented in Cython for speed.
 
+for the time being:
 
-```py
-snowflake0 = Snowflake()  # => 123456789, inst n°1
-snowflake1 = Snowflake()  # => 123451235, inst n°2
-snowflake2 = Snowflake()  # => 124576759, inst n°3
-snowflake3 = Snowflake()  # => 123454561, inst n°4
-```
+-   if you need something for a small project, where you need to generate unique ids that is also sortable, then you can use this version.
+-   if you need something that can scale, but keep the same idea of the snowflake, then ... you need to learn how does it work first. so you can implement it with your language of choice. Or improuve the one made in Python.
+
+> WIP
