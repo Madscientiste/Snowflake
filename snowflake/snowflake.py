@@ -35,7 +35,7 @@ class BaseSnowflake:
         if not isinstance(self._EPOCH, datetime):
             raise ValueError("Epoch must be a datetime")
 
-        # snowflake must be and int, if its an str, convert it to int
+        # snowflake must be an int, if its str, convert to int
         if isinstance(snowflake, str):
             snowflake = int(snowflake)
 
@@ -166,10 +166,6 @@ class Snowflake(BaseSnowflake):
         self.sequence = 0  # set the sequence to 0 so there is not mutation beween instances
         self.last_timestamp = 0
         self.snowflake = snowflake or int(next(self))
-
-    def __next__(self):
-        self.snowflake = next(iter(self))
-        return self
 
     def __iter__(self):
         while True:
