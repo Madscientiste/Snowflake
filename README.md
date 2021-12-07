@@ -12,7 +12,8 @@ Working on a light version where its not an object but a fonction and implemente
 
 for the time being:
 
--   if you need something for a small project, where you need to generate unique ids that is also sortable, then you can use this version.
--   if you need something that can scale, but keep the same idea of the snowflake, then ... you need to learn how does it work first. so you can implement it with your language of choice. Or improuve the one made in Python.
+-   if you need something for a small project, where you need to generate unique ids that is also sortable but don't care about its perf ( you still get at least 100K+ ids /s ), then you can use this version.
+
+-   if you need something that can scale, but keep the same idea of the snowflake, then ... you need to learn how does it work first, so you can implement it with your language of choice, Or improuve the one made in Python.
 
 > WIP
