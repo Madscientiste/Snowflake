@@ -16,4 +16,14 @@ for the time being:
 
 -   if you need something that can scale, but keep the same idea of the snowflake, then ... you need to learn how does it work first, so you can implement it with your language of choice, Or improuve the one made in Python.
 
+If you wish to use this package, you can install it with this command:
+
+```
+pip install git+https://github.com/Madscientiste/Snowflake.git@experimental#egg=Snowflake
+
+[or, get the main branch]
+
+pip install git+https://github.com/Madscientiste/Snowflake.git#egg=Snowflake
+```
+
 > WIP
